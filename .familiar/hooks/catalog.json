@@ -1,0 +1,294 @@
+{
+  "schema": "1.0",
+  "note": "Source of truth for install_hooks.py. A host with no entry for a hook is unsupported for it; Gemini CLI has no project-level hook file, so it is never written to (see INSTALL-HOOKS.md).",
+  "hooks": [
+    {
+      "id": "guard-writes",
+      "group": "guards",
+      "applies_to": "project",
+      "title": "Write guard",
+      "summary": "Denies writes outside the project, to 1-Inputs/ or to .familiar/ (CORE-WORKSPACE-SILO, CORE-COPY-ON-EDIT, CORE-INSTRUCTIONS-READONLY).",
+      "status": "verified on Claude Code 2026-10-27 (scratch project); untested on Codex",
+      "hosts": {
+        "claude": [
+          {
+            "event": "PreToolUse",
+            "matcher": "Write|Edit|Bash",
+            "script": "guards.py",
+            "args": [
+              "--guard",
+              "writes",
+              "--host",
+              "claude"
+            ]
+          }
+        ],
+        "codex": [
+          {
+            "event": "PreToolUse",
+            "matcher": "Bash",
+            "script": "guards.py",
+            "args": [
+              "--guard",
+              "writes",
+              "--host",
+              "codex"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "guard-delete",
+      "group": "guards",
+      "applies_to": "project",
+      "title": "Delete guard",
+      "summary": "Denies a shell delete unless every target is in scratch; anything it cannot parse with confidence is denied (CORE-NO-DELETE).",
+      "status": "verified on Claude Code 2026-10-27 (scratch project); untested on Codex",
+      "hosts": {
+        "claude": [
+          {
+            "event": "PreToolUse",
+            "matcher": "Bash",
+            "script": "guards.py",
+            "args": [
+              "--guard",
+              "delete",
+              "--host",
+              "claude"
+            ]
+          }
+        ],
+        "codex": [
+          {
+            "event": "PreToolUse",
+            "matcher": "Bash",
+            "script": "guards.py",
+            "args": [
+              "--guard",
+              "delete",
+              "--host",
+              "codex"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "guard-reads",
+      "group": "guards",
+      "applies_to": "project",
+      "title": "Read guard",
+      "summary": "Keeps reads inside the project folder, with narrow named exceptions (scratch, and the ~/.familiar/ files familiar's skills declare).",
+      "status": "verified on Claude Code 2026-10-27 (scratch project); untested on Codex",
+      "hosts": {
+        "claude": [
+          {
+            "event": "PreToolUse",
+            "matcher": "Read|Grep|Glob|Bash",
+            "script": "guards.py",
+            "args": [
+              "--guard",
+              "reads",
+              "--host",
+              "claude"
+            ]
+          }
+        ],
+        "codex": [
+          {
+            "event": "PreToolUse",
+            "matcher": "Bash",
+            "script": "guards.py",
+            "args": [
+              "--guard",
+              "reads",
+              "--host",
+              "codex"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "guard-boundary",
+      "group": "guards",
+      "applies_to": "project",
+      "title": "Boundary guard",
+      "summary": "Inside the maintainer checkout, refuses to scaffold a .familiar-project marker; elsewhere, keeps maintainer-only tooling from running against the wrong tree.",
+      "status": "untested-live",
+      "hosts": {
+        "claude": [
+          {
+            "event": "PreToolUse",
+            "matcher": "Write|Edit|Bash",
+            "script": "guards.py",
+            "args": [
+              "--guard",
+              "boundary",
+              "--host",
+              "claude"
+            ]
+          }
+        ],
+        "codex": [
+          {
+            "event": "PreToolUse",
+            "matcher": "Bash",
+            "script": "guards.py",
+            "args": [
+              "--guard",
+              "boundary",
+              "--host",
+              "codex"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "check-office",
+      "group": "checks",
+      "applies_to": "project",
+      "title": "Office file check",
+      "summary": "Advisory: flags a .docx/.pptx/.xlsx that is not a complete OOXML archive.",
+      "status": "untested-live",
+      "hosts": {
+        "claude": [
+          {
+            "event": "PostToolUse",
+            "matcher": "Write|Edit",
+            "script": "guards.py",
+            "args": [
+              "--guard",
+              "office",
+              "--host",
+              "claude"
+            ]
+          }
+        ],
+        "codex": [
+          {
+            "event": "PostToolUse",
+            "matcher": "Bash",
+            "script": "guards.py",
+            "args": [
+              "--guard",
+              "office",
+              "--host",
+              "codex"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "check-naming",
+      "group": "checks",
+      "applies_to": "project",
+      "title": "Draft naming check",
+      "summary": "Advisory: flags a 2-Drafts/ deliverable whose name breaks the YYYY-MM-DD_<label>_<STATUS>_vN[_AI].ext convention.",
+      "status": "verified on Claude Code 2026-10-27 (scratch project); untested on Codex",
+      "hosts": {
+        "claude": [
+          {
+            "event": "PostToolUse",
+            "matcher": "Write|Edit",
+            "script": "guards.py",
+            "args": [
+              "--guard",
+              "naming",
+              "--host",
+              "claude"
+            ]
+          }
+        ],
+        "codex": [
+          {
+            "event": "PostToolUse",
+            "matcher": "Bash",
+            "script": "guards.py",
+            "args": [
+              "--guard",
+              "naming",
+              "--host",
+              "codex"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "check-citation",
+      "group": "checks",
+      "applies_to": "project",
+      "title": "Citation field check",
+      "summary": "Advisory: flags a by-source 3-Knowledge/ page with a missing or malformed ref_carry_through field.",
+      "status": "untested-live",
+      "hosts": {
+        "claude": [
+          {
+            "event": "PostToolUse",
+            "matcher": "Write|Edit",
+            "script": "guards.py",
+            "args": [
+              "--guard",
+              "citation",
+              "--host",
+              "claude"
+            ]
+          }
+        ],
+        "codex": [
+          {
+            "event": "PostToolUse",
+            "matcher": "Bash",
+            "script": "guards.py",
+            "args": [
+              "--guard",
+              "citation",
+              "--host",
+              "codex"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "session-title",
+      "group": "titles",
+      "applies_to": "project",
+      "title": "Session title",
+      "summary": "Titles each Claude Code session \"(<signature>) <project name>\" so Remote Control on a phone or the web lists it by project instead of a generic machine-and-word name.",
+      "status": "verified on Claude Code 2026-10-27 (installed at user level)",
+      "hosts": {
+        "claude": [
+          {
+            "event": "SessionStart",
+            "matcher": "startup|resume",
+            "script": "session_title.py",
+            "args": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "session-title-hub",
+      "group": "titles",
+      "applies_to": "hub",
+      "title": "Hub session title",
+      "summary": "Titles a fleet hub session \"familiar hub\", or \"familiar hub: <category>\" for a scoped hub, so two hubs read differently in the session list.",
+      "status": "untested-live",
+      "hosts": {
+        "claude": [
+          {
+            "event": "SessionStart",
+            "matcher": "startup|resume",
+            "script": "session_title_hub.py",
+            "args": []
+          }
+        ]
+      }
+    }
+  ]
+}
