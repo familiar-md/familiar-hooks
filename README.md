@@ -16,19 +16,33 @@ through an interpreter can get past them. Every hook starts Python around ordina
 trip endpoint protection or script policy on managed work hardware, so check before installing there.
 familiar works fully without any of this.
 
+## Per project, by choice
+
+Hooks are installed per project, so each project gets only the ones it needs: strict guards on a
+confidential engagement, just the session title on a personal one. The hub cannot apply hooks for its
+projects, because your assistant loads hooks from the folder it is opened in.
+
 ## Start
 
-1. Copy this package's `.familiar/hooks/` folder into your project's `.familiar/` folder.
-2. In the project, run `/ili-system-settings` → Hooks (Claude Code), or by hand:
-   `python .familiar/hooks/install_hooks.py list`, then `preview <id>`, then `apply <id> --yes`.
-3. Restart the session.
+1. Download `familiar-hooks-<version>.zip` from
+   [Releases](https://github.com/familiar-md/familiar-hooks/releases) and unzip it.
+2. Copy the `.familiar` folder inside it onto your project folder. It adds `.familiar/hooks/` beside
+   what is already there and changes nothing else. (`.familiar` is a hidden folder: show hidden files
+   if you cannot see it.)
+3. In the project, run `/ili-system-settings` → Hooks (Claude Code) or `/system-settings` → Hooks. The
+   assistant lists the hooks, asks which you want, shows what will change and installs only after your
+   yes. Then restart the session.
+
+Repeat for each project that should have hooks. To install by hand instead, see
+[`INSTALL-HOOKS.md`](INSTALL-HOOKS.md).
 
 ## Read next
 
-- [`INSTALL-HOOKS.md`](INSTALL-HOOKS.md): installing per host, verifying, removing.
+- [`INSTALL-HOOKS.md`](INSTALL-HOOKS.md): installing per host, by hand, verifying, removing.
 - [`MANUAL-HOOKS.md`](MANUAL-HOOKS.md): what each hook decides, what a denial looks like, the limits.
 
-Claude Code is the host the hooks have been seen working on. Codex is supported by the installer but
-not live-tested; Gemini CLI needs the hooks added by hand.
+Hooks belong to the agent harness, not the model: they run the same whichever model the harness uses.
+Tested with Claude Code. The installer also writes Codex's hook file; Gemini CLI needs the hooks added
+by hand, and other harnesses may have no hooks at all.
 
 Apache 2.0, like familiar core. See [`LICENSE`](LICENSE).

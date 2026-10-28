@@ -21,16 +21,18 @@ declare in your home folder: `~/.familiar/user-preferences.md`, `~/.familiar/fle
 registry, for `/system-settings` → Fleet) and `~/.familiar/brief-profiles/<id>.md` (for
 `/deliverable-brief`). Anything else under `~/.familiar/` is denied like any other outside path.
 
-`.familiar/hooks/catalog.json` is the full list with each hook's events, matchers and live-test status.
-`session-title` is confirmed on Claude Code. The write, read and delete guards and the naming check were
-seen working in a live Claude Code session on 2026-10-27; nothing has been live-tested on Codex or Gemini,
-so `mechanical-enforcement` stays `available`, never `active`. `MANUAL-HOOKS.md` explains how each hook
-decides, what you see when one fires, and where they stop.
+`.familiar/hooks/catalog.json` is the full list with each hook's events and matchers.
+`MANUAL-HOOKS.md` explains how each hook decides, what you see when one fires, and where they stop.
+
+Hooks are installed per project (and once in a hub, for its session title). Repeat the steps below in
+each project that should have them.
 
 ## Install
 
-1. **Copy the package in.** Copy this package's `.familiar/hooks/` folder into the project's (or hub's)
-   `.familiar/` folder. Do not copy `_about.md`, `VERSION`, `MANUAL-HOOKS.md` or this file; they are package metadata.
+1. **Copy the package in.** Download `familiar-hooks-<version>.zip` from the
+   [Releases page](https://github.com/familiar-md/familiar-hooks/releases), unzip it, and copy the
+   `.familiar` folder inside it onto the project (or hub) folder. That adds `.familiar/hooks/` and
+   changes nothing else.
 2. **Choose and apply.** Either let your assistant do it, or run the tool yourself; they are the same tool.
    - **Assistant-led, in a project:** run `/system-settings` and choose **Hooks**. It lists the hooks,
      asks which you want, shows exactly what will change, and applies only after your yes. In a hub,
@@ -60,8 +62,8 @@ Hook configuration is not uniform across hosts:
 | Host | Where hooks live | What the tool does |
 |---|---|---|
 | Claude Code | Inline `"hooks"` key in `.claude/settings.json`, `.claude/settings.local.json` or `~/.claude/settings.json`. No standalone `hooks.json` is auto-loaded outside a plugin. | Merges into `.claude/settings.local.json` (per-machine, adds to the project's own settings.json). Default host. |
-| Codex CLI | Auto-loads a standalone `<repo>/.codex/hooks.json`. Confirmed with less confidence than the other rows: the project-root assumption and the `Bash`-only matcher are unverified against a live session, so Codex hooks may not catch file tools. Guards only. | `--host codex` merges into `.codex/hooks.json`. |
-| Gemini CLI | Inline `"hooks"` key in Gemini's own settings. The global path (`~/.config/gemini-cli/settings.json`) is confirmed; the project-level path and its merge behavior are not. | Nothing written. Add a `"hooks"` block by hand, one `BeforeTool` entry per guard with `--host gemini` on each; `guards.py` reads the project `cwd` from Gemini's payload itself. |
+| Codex CLI | Auto-loads a standalone `<repo>/.codex/hooks.json`. The hooks match shell commands only, so they may not catch Codex's own file tools. Guards only. | `--host codex` merges into `.codex/hooks.json`. |
+| Gemini CLI | Inline `"hooks"` key in Gemini's own settings (`~/.config/gemini-cli/settings.json`). | Nothing written. Add a `"hooks"` block by hand, one `BeforeTool` entry per guard with `--host gemini` on each; `guards.py` reads the project `cwd` from Gemini's payload itself. |
 
 Session-title hooks are Claude Code only: `sessionTitle` is a Claude Code `SessionStart` output.
 

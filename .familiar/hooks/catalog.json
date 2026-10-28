@@ -8,7 +8,7 @@
       "applies_to": "project",
       "title": "Write guard",
       "summary": "Denies writes outside the project, to 1-Inputs/ or to .familiar/ (CORE-WORKSPACE-SILO, CORE-COPY-ON-EDIT, CORE-INSTRUCTIONS-READONLY).",
-      "status": "verified on Claude Code 2026-10-27 (scratch project); untested on Codex",
+      "status": "verified on Claude Code",
       "hosts": {
         "claude": [
           {
@@ -44,7 +44,7 @@
       "applies_to": "project",
       "title": "Delete guard",
       "summary": "Denies a shell delete unless every target is in scratch; anything it cannot parse with confidence is denied (CORE-NO-DELETE).",
-      "status": "verified on Claude Code 2026-10-27 (scratch project); untested on Codex",
+      "status": "verified on Claude Code",
       "hosts": {
         "claude": [
           {
@@ -80,7 +80,7 @@
       "applies_to": "project",
       "title": "Read guard",
       "summary": "Keeps reads inside the project folder, with narrow named exceptions (scratch, and the ~/.familiar/ files familiar's skills declare).",
-      "status": "verified on Claude Code 2026-10-27 (scratch project); untested on Codex",
+      "status": "verified on Claude Code",
       "hosts": {
         "claude": [
           {
@@ -188,7 +188,7 @@
       "applies_to": "project",
       "title": "Draft naming check",
       "summary": "Advisory: flags a 2-Drafts/ deliverable whose name breaks the YYYY-MM-DD_<label>_<STATUS>_vN[_AI].ext convention.",
-      "status": "verified on Claude Code 2026-10-27 (scratch project); untested on Codex",
+      "status": "verified on Claude Code",
       "hosts": {
         "claude": [
           {
@@ -260,7 +260,7 @@
       "applies_to": "project",
       "title": "Session title",
       "summary": "Titles each Claude Code session \"(<signature>) <project name>\" so Remote Control on a phone or the web lists it by project instead of a generic machine-and-word name.",
-      "status": "verified on Claude Code 2026-10-27 (installed at user level)",
+      "status": "verified on Claude Code",
       "hosts": {
         "claude": [
           {

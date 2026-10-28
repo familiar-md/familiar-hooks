@@ -101,12 +101,13 @@ declares the file, and a guard allowance to match), not an override.
 
 | Host | Guards and checks | Titles |
 |---|---|---|
-| Claude Code | Installed by the tool into `.claude/settings.local.json`. Write, read, delete, `1-Inputs/` and naming behaviour seen in a live session 2026-10-27. | Yes. |
-| Codex CLI | Installed into `.codex/hooks.json`. Hooks see shell commands only, so Codex's own file tools may pass unchecked. Not live-tested. | No. |
-| Gemini CLI | Added by hand (see `INSTALL-HOOKS.md`). Not live-tested. | No. |
+| Claude Code | Installed by the tool into `.claude/settings.local.json`. Tested. | Yes. |
+| Codex CLI | Installed into `.codex/hooks.json`. Hooks see shell commands only, so Codex's own file tools may pass unchecked. | No. |
+| Gemini CLI | Added by hand (see `INSTALL-HOOKS.md`). | No. |
 
-Because the guards have not passed on every host and are not yet in a release,
-`.familiar/installed.json` keeps `mechanical-enforcement` at `available`. Nothing in familiar
+Hooks belong to the agent harness, not the model: they fire on any model the harness runs, and a
+harness not listed here may have no hooks at all. `.familiar/installed.json` keeps
+`mechanical-enforcement` at `available`. Nothing in familiar
 assumes a guard is present.
 
 ## Limits

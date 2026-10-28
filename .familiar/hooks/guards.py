@@ -1,18 +1,13 @@
 #!/usr/bin/env python3
-"""guards.py - cross-platform port of familiar's four PreToolUse guard hooks.
+"""guards.py - familiar's guard and check hooks, one cross-platform runtime.
 
-Phase 2 of the model-agnostic architecture work (design rationale lives in the
-maintainer repo, deliberately not cited by path -- a shipped file must resolve
-standalone). Ported to Design A's drop-in shape (no installer, no plugin cache, no
-fleet registry) 2026-09-07, then moved into this package's own familiar-hooks/ drop-in
-folder the same day -- see this package's own INSTALL-HOOKS.md for install steps and
-what is still deferred to a future standalone familiar-hooks repo.
+Install steps per host: INSTALL-HOOKS.md (https://github.com/familiar-md/familiar-hooks/blob/main/INSTALL-HOOKS.md).
 
 STATUS: WIRED IN. Each host's own hook configuration, written by install_hooks.py (.claude/settings.local.json's inline
 "hooks" key, .codex/hooks.json) invokes this file for all seven guards. There is no single
 shared hooks.json across hosts -- Claude Code and Gemini CLI only read hook definitions
 written inline in a settings file, never a standalone hooks.json; Codex is the one host
-that auto-loads a standalone <repo>/.codex/hooks.json. See INSTALL-HOOKS.md.
+that auto-loads a standalone <repo>/.codex/hooks.json.
 
 WHY. The .ps1 guards invoke powershell.exe by name. On macOS and Linux that binary does not
 exist under any name (the PowerShell binary there is `pwsh`), so it is a hard ENOENT rather

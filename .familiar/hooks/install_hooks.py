@@ -15,7 +15,8 @@ indented by two spaces, and the original is copied to `<file>.pre-familiar-hooks
 
 Hosts: `claude` writes `.claude/settings.local.json` (per-machine, additive to settings.json);
 `codex` writes `.codex/hooks.json`. Gemini CLI has no project-level hook file confirmed, so nothing is
-written for it; see INSTALL-HOOKS.md.
+written for it; see INSTALL-HOOKS.md
+(https://github.com/familiar-md/familiar-hooks/blob/main/INSTALL-HOOKS.md).
 
 The interpreter written into each hook is the first of `python3`, `python`, `py -3` that actually runs
 Python 3.10+ here, found when you apply, not guessed. Standard library only.
@@ -156,7 +157,7 @@ def plan(catalog, args, ctx, writing):
     host = args.host
     if host == "gemini":
         die("Gemini CLI has no project-level hook file confirmed, so nothing can be written for it. "
-            "See INSTALL-HOOKS.md for the by-hand route.")
+            "See INSTALL-HOOKS.md for the by-hand route: https://github.com/familiar-md/familiar-hooks/blob/main/INSTALL-HOOKS.md")
     path = ROOT / HOOK_FILES[host]
     settings = read_settings(path)
     picked = select(catalog, args, ctx)
