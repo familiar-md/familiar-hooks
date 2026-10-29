@@ -1,71 +1,83 @@
 # familiar-hooks manual
 
-What each hook does, how the guards decide, what you see when one fires, and where they stop. For
-installing, choosing hooks and removing them, see `INSTALL-HOOKS.md`.
+This manual covers what each hook does, how the guards decide, what you see when one acts, and what
+the guards cannot stop. `INSTALL-HOOKS.md` covers installing, choosing and removing hooks.
 
 ## What the package is
 
-familiar's rules (stay inside the project, never delete, never edit a source, never edit familiar's
-own files) are instructions the assistant follows by judgment. This package adds an optional second
-line: small scripts the coding host runs around a tool call. A guard runs before the call and can
-deny it. A check runs after a file is written and tells the assistant what is wrong with it. A
-title hook names the session.
+familiar has rules: stay inside the project, never delete, never edit a source, never edit
+familiar's own files. Without hooks, these rules are instructions that the agent follows. This
+package adds an optional mechanical check. It is a set of small scripts that the agent runs around a
+tool call:
 
-It is a deterrent against the common mistake, not a security boundary. An assistant that sets out
-to get around a guard can (see Limits). Every hook launches a Python interpreter around ordinary
-activity, which can trigger corporate endpoint protection or script-execution policy on managed
-hardware. Check before installing on work equipment. familiar works fully without any of it.
+- A **guard** runs before the call and can deny it.
+- A **check** runs after a file is written and tells the agent what is wrong with the file.
+- A **title hook** names the session.
+
+The guards catch the common mistakes. They are not a guarantee or a security boundary. An agent that
+tries to get around a guard can do so (see [Limits](#limits)).
+
+Every hook starts a Python interpreter around ordinary work. On a work computer that your employer
+manages, this can set off endpoint protection or break a script policy. Check the rules before you
+install hooks on work equipment. familiar works fully without them.
 
 ## The hooks
 
 | Hook | Runs | Decides |
 |---|---|---|
 | `guard-writes` | before Write, Edit, shell | Denies a write outside the project folder, into `1-Inputs/`, or into `.familiar/`. |
-| `guard-delete` | before shell | Denies any shell delete unless every target is in the host's scratch folder. |
+| `guard-delete` | before shell | Denies any shell delete unless every target is in the agent's scratch folder. |
 | `guard-reads` | before Read, Grep, Glob, shell | Denies a read outside the project folder. |
-| `guard-boundary` | before Write, Edit, shell | Maintainer safety: no project marker inside familiar's own source checkout, no maintainer audit tool run from a project. |
-| `check-office` | after Write, Edit | Flags a `.docx`, `.pptx` or `.xlsx` that is not a complete file (a truncated write). |
-| `check-naming` | after Write, Edit | Flags a deliverable in `2-Drafts/` whose name breaks `YYYY-MM-DD_<label>_<STATUS>_vN[_AI].ext`. |
-| `check-citation` | after Write, Edit | Flags a source page in `3-Knowledge/` with a missing or malformed `ref_carry_through` field. |
-| `session-title` | session start | Titles a Claude Code session `(<signature>) <project name>`. |
-| `session-title-hub` | session start | Titles a hub session `familiar hub` or `familiar hub: <category>`. |
+| `guard-boundary` | before Write, Edit, shell | For people who develop familiar: no project marker inside familiar's own source folder, and no maintainer audit tool run from a project. |
+| `check-office` | after Write, Edit | Flags a `.docx`, `.pptx` or `.xlsx` that is not a complete file (a cut-off write). |
+| `check-naming` | after Write, Edit | Flags a deliverable in `2-Drafts/` whose name does not match `YYYY-MM-DD_<label>_<STATUS>_vN[_AI].ext`. |
+| `check-citation` | after Write, Edit | Flags a source page in `3-Knowledge/` whose `ref_carry_through` field is missing or in the wrong form. |
+| `session-title` | session start | Names a Claude Code session `(<signature>) <project name>`. |
+| `session-title-hub` | session start | Names a hub session `familiar hub` or `familiar hub: <category>`. |
 
-Install any subset. The four guards are usually taken together (`--group guards`).
+Install any set of hooks. Most people install the four guards together (`--group guards`).
 
 ## How the guards decide
 
 **Only inside a familiar project.** Every guard except `guard-boundary` first looks for the
-`.familiar-project` marker in the project folder. Without it the guard allows everything, so a hook
-left behind in an unrelated folder does nothing.
+`.familiar-project` marker in the project folder. If there is no marker, the guard allows everything.
+A hook left behind in an unrelated folder therefore does nothing.
 
-**The project folder is the boundary.** Reads and writes resolve the target path, relative paths
-included, and allow it when it sits under the project folder. Outside it, three things are allowed:
+**The project folder is the boundary.** For each read or write, the guard resolves the target path,
+relative paths included. It allows the target if it is under the project folder. Outside the project
+folder, it allows only:
 
-- the host's scratch folder (`AppData\Local\Temp\` on Windows, `/tmp/` elsewhere);
-- the home-folder files familiar's own skills declare: `~/.familiar/user-preferences.md` and
-  `~/.familiar/brief-profiles/<id>.md` (global profiles from `/deliverable-brief`, one level deep,
-  `.md` only);
-- nothing else. Any other file under `~/.familiar/` is denied like any outside path.
+- the agent's scratch folder (`AppData\Local\Temp\` on Windows, `/tmp/` elsewhere)
+- the files in your home folder that familiar's own skills declare: `~/.familiar/user-preferences.md`
+  and `~/.familiar/brief-profiles/<id>.md` (global profiles from `/ili-deliverable-brief`, one level
+  deep, `.md` only)
 
-**Inside the project, two places are read-only.** `1-Inputs/` holds sources; a changed source
-becomes a new dated copy elsewhere. `.familiar/` holds familiar's own protocol, routes and skills;
-behaviour feedback goes in `5-System/user-preferences.md` instead.
+It denies every other file under `~/.familiar/`, the same as any other path outside the project.
 
-**Shell commands are read for their targets.** For a shell call, the guards look for the common
-verbs: `cp`, `mv`, `copy`, `Copy-Item`, `Move-Item`, `Set-Content`, `Out-File`, `tee` and `>`
-redirection for writes; `cat`, `type`, `head`, `tail`, `Get-Content` for reads; `rm`, `del`,
-`Remove-Item`, `find -delete` and `git clean` for deletes. A `cmd /c` or `powershell -Command`
-wrapper is unwrapped first, and `cd` earlier in the same command is followed. A path that still
-holds an unresolved `$variable` is denied rather than guessed at.
+**Inside the project, two places are read-only.** `1-Inputs/` holds sources. A changed source
+becomes a new dated copy in another folder. `.familiar/` holds familiar's own rules, routes and
+skills. Feedback on how familiar behaves goes in `5-System/user-preferences.md` instead.
 
-**Deletes are allow-listed.** `guard-delete` allows a delete only when it can show every target is
-in scratch. Anything it cannot parse with confidence is denied. `git clean` is always denied. To
-retire a file, say so and let the user remove it.
+**Shell commands are read for their targets.** For a shell call, the guards look for these common
+commands:
+
+- writes: `cp`, `mv`, `copy`, `Copy-Item`, `Move-Item`, `Set-Content`, `Out-File`, `tee` and `>`
+  redirection
+- reads: `cat`, `type`, `head`, `tail`, `Get-Content`
+- deletes: `rm`, `del`, `Remove-Item`, `find -delete` and `git clean`
+
+The guards unwrap a `cmd /c` or `powershell -Command` wrapper first. They follow a `cd` earlier in the
+same command. If a path still holds an unresolved `$variable`, the guard denies it. It does not
+guess.
+
+**Deletes are allowed only by list.** `guard-delete` allows a delete only when it can show that every
+target is in the scratch folder. It denies anything it cannot read with confidence. It always denies
+`git clean`. To retire a file, the agent says so and lets you remove it.
 
 ## What you see
 
-When a guard denies a call, the call does not run and the assistant gets the reason, which starts
-with the rule it protects. For example:
+When a guard denies a call, the call does not run. The agent gets the reason, which starts with the
+rule that the guard protects. For example:
 
 ```text
 CORE-WORKSPACE-SILO: write only inside the project folder. Target is outside it: C:\Users\you\Desktop\out.txt
@@ -74,64 +86,68 @@ CORE-COPY-ON-EDIT: source input is read-only - never write into '1-Inputs/'.
 familiar: read only within the project folder. Target is outside it: D:\other\notes.txt
 ```
 
-A well-behaved assistant reports the denial and asks you how to proceed. It should not try another
-route to the same result.
+The agent is expected to report the denial and ask you what to do. It is not expected to try another
+way to get the same result.
 
-A check cannot undo a write; the file already exists. It hands the assistant a note such as "this
-name breaks the drafts convention" so the assistant can fix the file in the same turn.
+A check cannot undo a write, because the file already exists. It gives the agent a note such as
+"this name breaks the drafts convention", so that the agent can fix the file in the same turn.
 
-A title hook shows only in the session list: `claude --resume`, or Remote Control on a phone or the
-web.
+A session title shows only in the session list: `claude --resume`, or Remote Control on a phone or
+the web.
 
 ## Overrides
 
-For the person maintaining familiar itself, not for project work:
+These settings are for people who develop familiar or an extension, not for project work:
 
 | Setting | Effect |
 |---|---|
 | `FAMILIAR_MAINTAINER=1` in the environment | All project guards allow everything. |
-| A `.familiar-maintainer` file whose content is its own folder's path | Same, for that folder. The content check stops a copied marker from working elsewhere. |
-| `FAMILIAR_ALLOW_SCAFFOLD=1` | Lets `guard-boundary` allow a project marker inside the source checkout. |
+| A `.familiar-maintainer` file that contains its own folder's path | The same, for that folder only. Because of the path check, a copied file does not work in another folder. |
+| `FAMILIAR_ALLOW_SCAFFOLD=1` | `guard-boundary` allows a project marker inside the source folder. |
 
-If a guard blocks something a project really needs, the fix belongs in familiar (a skill that
-declares the file, and a guard allowance to match), not an override.
+If a guard blocks something that a project really needs, do not use an override. The fix belongs in
+familiar: a skill that declares the file, and a guard allowance to match.
 
 ## Hosts
 
-| Host | Guards and checks | Titles |
+| Agent | Guards and checks | Titles |
 |---|---|---|
-| Claude Code | Installed by the tool into `.claude/settings.local.json`. Tested. | Yes. |
-| Codex CLI | Installed into `.codex/hooks.json`. Hooks see shell commands only, so Codex's own file tools may pass unchecked. | No. |
-| Gemini CLI | Added by hand (see `INSTALL-HOOKS.md`). | No. |
+| Claude Code | The installer writes them into `.claude/settings.local.json`. Tested. | Yes |
+| Codex CLI | The installer writes them into `.codex/hooks.json`. Hooks see shell commands only, so Codex's own file tools can pass without a check. | No |
+| Gemini CLI | You add them by hand (see `INSTALL-HOOKS.md`). | No |
 
-Hooks belong to the agent harness, not the model: they fire on any model the harness runs, and a
-harness not listed here may have no hooks at all. `.familiar/installed.json` keeps
-`mechanical-enforcement` at `available`. Nothing in familiar
-assumes a guard is present.
+Hooks belong to the agent program, not to the model. They run on any model that the program runs. An
+agent program that is not in this table can have no hooks at all. `.familiar/installed.json` keeps
+`mechanical-enforcement` at `available`. Nothing in familiar depends on a guard being present.
 
 ## Limits
 
-- **Scripts get past them.** The guards read command text. A file written or read by a script
-  (`python make.py`, `python -c "..."`, `[IO.File]::WriteAllText(...)`) shows no verb the guards
-  recognise, and it passes. This cannot be closed by matching more patterns.
-- **Uncommon verbs pass.** Shell commands outside the lists above are not inspected. Deletes are
-  the exception: those are allow-listed.
-- **Checks are structural.** `check-citation` confirms the field is present and shaped right, not
-  that its count is honest. `check-office` confirms the file is a complete archive, not that its
-  content is right.
-- **One project at a time.** The guards know one project root per session, the folder the host
-  was opened in.
+- **Scripts get past the guards.** The guards read the command text. A script can read or write a
+  file (`python make.py`, `python -c "..."`, `[IO.File]::WriteAllText(...)`). The command text then
+  shows no command that the guards recognize, so the call passes. More patterns cannot close this gap.
+- **Uncommon commands pass.** The guards do not inspect shell commands outside the lists above.
+  Deletes are the exception, because a delete must be on the allow list.
+- **Checks look at structure only.** `check-citation` confirms that the field is present and in the
+  right form, not that its count is true. `check-office` confirms that the file is a complete
+  archive, not that its content is right.
+- **One project at a time.** The guards know one project folder per session: the folder that the
+  agent opened in.
 
 ## Troubleshooting
 
-**Every tool call fails with a hook error naming `python3` or `py`.** The interpreter written at
-install time is gone or not on this machine. Run `python .familiar/hooks/install_hooks.py apply
-<ids> --yes` again on this machine; it finds a working Python 3.10+ and rewrites the entries.
+**Every tool call fails with a hook error that names `python3` or `py`.** The interpreter that the
+installer recorded is gone or not on this computer. Run
+`python .familiar/hooks/install_hooks.py apply <ids> --yes` again on this computer. It finds a working
+Python 3.10 or newer and writes the entries again.
 
-**A guard blocks something familiar itself asked to do.** Note the reason text and the path. Either
-a skill touches a file it never declared, or the guard has not caught up with a skill. Both are
-familiar bugs worth reporting. Meanwhile, `remove` the one guard involved.
+**A guard blocks something that familiar itself asked to do.** Note the reason text and the path.
+Either a skill uses a file that it never declared, or the guard is behind a skill. Both are familiar
+bugs, so please report them. Until there is a fix, `remove` the one guard involved.
 
-**Nothing is ever blocked.** Confirm `.familiar-project` exists in the folder the host was opened
-in, that you restarted the session after applying, and that `FAMILIAR_MAINTAINER` is not set. Then
-ask the assistant to write a file to your Desktop: it should come back denied.
+**Nothing is ever blocked.** Check these three things:
+
+1. `.familiar-project` exists in the folder that the agent opened in.
+2. You started a new session after you turned the hooks on.
+3. `FAMILIAR_MAINTAINER` is not set.
+
+Then ask the agent to write a file to your Desktop. The guard denies it if it works.
