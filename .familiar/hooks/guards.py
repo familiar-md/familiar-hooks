@@ -80,16 +80,16 @@ BOM = chr(0xFEFF)
 # --- shared patterns (ported verbatim from the .ps1 guards) ---------------------------------
 SCRATCH_ROOT = re.compile(r"(AppData[\\/]Local[\\/]Temp[\\/]|^/tmp/)", re.I)
 # familiar's own machine-level files, outside any project, matched by exact name:
-# user-preferences.md, the optional cross-project preferences fallback bootstrap.md and checkin
-# both name (the familiar signature, a cross-project voice default), and fleet.md, the fleet hub's
-# registry, whose own-project row /system-settings -> Fleet reads and writes. Home is host-neutral
-# ~/.familiar/ - ~/.claude/ means nothing to Gemini. The legacy ~/.claude/familiar-fleet.md is not
-# matched, and every other file under ~/.familiar/ stays blocked. One folder is allowed too:
+# user-preferences.md, the optional cross-project preferences fallback bootstrap.md and check-in
+# both name (the familiar signature, a cross-project voice default). Home is host-neutral
+# ~/.familiar/ - ~/.claude/ means nothing to Gemini. fleet.md, the fleet hub's registry, is not
+# matched: since 1.0 only the hub reads and writes it, never a project session. Every other file
+# under ~/.familiar/ stays blocked. One folder is allowed too:
 # brief-profiles/, where /deliverable-brief keeps global profiles as <id>.md, one level deep.
-FAMILIAR_HOME_FILES = ("user-preferences.md", "fleet.md")
+FAMILIAR_HOME_FILES = ("user-preferences.md",)
 FAMILIAR_HOME_DIR = "brief-profiles"
 FAMILIAR_HOME_FILE = re.compile(
-    r"[\\/]\.familiar[\\/](?:user-preferences\.md|fleet\.md|brief-profiles[\\/][^\\/]+\.md)$", re.I)
+    r"[\\/]\.familiar[\\/](?:user-preferences\.md|brief-profiles[\\/][^\\/]+\.md)$", re.I)
 DELETE_VERB = re.compile(
     r"(^|[;&|(]\s*)(rm|rmdir|unlink|shred|del|erase|rd|ri|remove-item)\b\s", re.I | re.M)
 DELETE_FLAG = re.compile(r"(\s-delete\b|\bgit\s+clean\b)", re.I)
@@ -592,9 +592,9 @@ def _decide_read_target(fp: str, ctx: Context) -> Decision:
     if SCRATCH_ROOT.search(resolved):
         return ALLOW
     if ctx.home:
-        # checkin reads the user's optional cross-project preferences fallback (the familiar
-        # signature default), /system-settings -> Fleet reads the hub's registry, and
-        # /deliverable-brief lists and reads global profiles - the only legitimate home reads.
+        # The bootstrap and check-in read the user's optional cross-project preferences fallback
+        # (the familiar signature default), and /deliverable-brief lists and reads global profiles -
+        # the only legitimate home reads.
         for name in FAMILIAR_HOME_FILES:
             known = resolve_lexical("", os.path.join(ctx.home, ".familiar", name))
             if resolved.lower() == known.lower():
@@ -609,7 +609,7 @@ def _decide_read_target(fp: str, ctx: Context) -> Decision:
             f"familiar: read only within the project folder. Target is outside it: {fp}\nIf this file is "
             "needed, ask the user for it or have them copy it into the project's 1-Inputs folder "
             "rather than reading it directly. (Reads under AppData\\Local\\Temp\\claude\\, "
-            "~/.familiar/user-preferences.md, ~/.familiar/fleet.md and ~/.familiar/brief-profiles/*.md "
+            "~/.familiar/user-preferences.md and ~/.familiar/brief-profiles/*.md "
             "are auto-allowed. Maintainer override: "
             "FAMILIAR_MAINTAINER=1 or the .familiar-maintainer marker.)")
 

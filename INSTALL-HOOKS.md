@@ -17,8 +17,7 @@ Nine hooks, installed one at a time. Nothing is on by default.
 | `check-office`, `check-naming`, `check-citation` | project | Advisory only: flag a truncated Office file, a misnamed draft, or a malformed citation field after the fact. |
 
 Outside the project, the reads and writes guards let through only the files familiar's own skills
-declare in your home folder: `~/.familiar/user-preferences.md`, `~/.familiar/fleet.md` (the hub's
-registry, for `/system-settings` → Fleet) and `~/.familiar/brief-profiles/<id>.md` (for
+declare in your home folder: `~/.familiar/user-preferences.md` and `~/.familiar/brief-profiles/<id>.md` (for
 `/deliverable-brief`). Anything else under `~/.familiar/` is denied like any other outside path.
 
 `.familiar/hooks/catalog.json` is the full list with each hook's events and matchers.

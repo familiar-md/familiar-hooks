@@ -42,8 +42,7 @@ left behind in an unrelated folder does nothing.
 included, and allow it when it sits under the project folder. Outside it, three things are allowed:
 
 - the host's scratch folder (`AppData\Local\Temp\` on Windows, `/tmp/` elsewhere);
-- the home-folder files familiar's own skills declare: `~/.familiar/user-preferences.md`,
-  `~/.familiar/fleet.md` (the hub's registry, used by `/system-settings` → Fleet) and
+- the home-folder files familiar's own skills declare: `~/.familiar/user-preferences.md` and
   `~/.familiar/brief-profiles/<id>.md` (global profiles from `/deliverable-brief`, one level deep,
   `.md` only);
 - nothing else. Any other file under `~/.familiar/` is denied like any outside path.
