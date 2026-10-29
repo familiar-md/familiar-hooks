@@ -1,0 +1,14 @@
+{
+  "blocks": {},
+  "build": "e9a578d683ef",
+  "files": {
+    ".familiar/hooks/catalog.json": "1792528c9663c3b66444529e8e83b978f591e36eba4aa859daeacebc3c7f55fc",
+    ".familiar/hooks/guards.py": "f3b2544cb9f4be4effa7cccd46892cf71f47be294d4106c0f60cabdbe29a14a8",
+    ".familiar/hooks/install_hooks.py": "48bc4a19385474de6b59a4dbaf7c3a2e9bc32db7b316ac564bf43436dce2c5a7",
+    ".familiar/hooks/session_title.py": "568d0e8b4c2dbefc30fae6a6b4ec6c507f3bf927f4b99d79b18c15c1357d245a",
+    ".familiar/hooks/session_title_hub.py": "4550f356c9c85d95b2d7c19edf30ad7a83f34d1fd7a953c0c2bf533ac8f617f0"
+  },
+  "owner": "familiar-hooks",
+  "schema": 1,
+  "version": "1.0.1"
+}

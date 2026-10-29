@@ -72,6 +72,14 @@ Per hook, before trusting it. For `session-title`: start a new session in the pr
 (or the Remote Control list on your phone) shows `(<signature>) <project name>`. For a guard: try a write
 outside the project and confirm it is denied with a `CORE-WORKSPACE-SILO` reason, not silently allowed.
 
+## Updating
+
+In a project, put the new `familiar-hooks-<version>.zip` in the project's `_update/` folder, with
+any other downloads, and run `/system-settings` → Update; the hooks update with core. A project whose
+hooks were copied in before they carried a release manifest gets one by copying the new `.familiar`
+folder on once, as in Install step 1. In a hub, copy the new `.familiar` folder on again. Hooks you
+switched on stay on.
+
 ## Removing it again
 
 ```text
