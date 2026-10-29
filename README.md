@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/assets/familiar-hooks-banner.svg" alt="familiar: hooks extension" width="720">
+</p>
+
 # familiar-hooks
 
 Optional hooks for a [familiar](https://github.com/familiar-md/familiar) project or
